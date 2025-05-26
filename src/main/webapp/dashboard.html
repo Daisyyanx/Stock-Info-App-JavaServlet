@@ -1,0 +1,302 @@
+<!--//Name: Xiao Yan-->
+<!--//Andrew ID: xyan3-->
+
+<!-- src/main/webapp/ 是 Java Web 项目默认的静态资源目录，任何放在这里的 .html 文件都能被 Tomcat 自动访问。 -->
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8">-->
+<!--  &lt;!&ndash; 设置网页标题 &ndash;&gt;-->
+<!--  <title>Stock Dashboard</title>-->
+
+<!--  &lt;!&ndash; 引入 Chart.js 库，用于绘图 &ndash;&gt;-->
+<!--  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
+<!--</head>-->
+<!--<body>-->
+<!--&lt;!&ndash; 页面主标题 &ndash;&gt;-->
+<!--<h1>Stock Query Dashboard</h1>-->
+
+<!--&lt;!&ndash; 一个按钮，点击后从 /logs 拉取数据并渲染折线图 &ndash;&gt;-->
+<!--<button onclick="loadLogs()">Load Logs</button>-->
+<!--&lt;!&ndash; 用于显示日志图表的 canvas 容器 &ndash;&gt;-->
+<!--<canvas id="logsChart" width="800" height="400"></canvas>-->
+
+<!--&lt;!&ndash; 第二个按钮，从 /stats 获取数据并渲染柱状图 &ndash;&gt;-->
+<!--<button onclick="loadStats()">Load Stats</button>-->
+<!--&lt;!&ndash; 用于显示 stats 的图表 &ndash;&gt;-->
+<!--<canvas id="statsChart" width="800" height="400"></canvas>-->
+
+<!--&lt;!&ndash; 第三个按钮，从 /stats 获取并渲染 Top 5 股票价格波动最多的 &ndash;&gt;-->
+<!--<button onclick="loadTopVolatile()">Top 5 Volatile</button>-->
+<!--<canvas id="volatileChart" width="800" height="400"></canvas>-->
+
+<!--&lt;!&ndash; 第四个按钮，从 /stats 获取并渲染被查询次数最多的 5 个公司 &ndash;&gt;-->
+<!--<button onclick="loadTopSearched()">Top 5 Most Queried</button>-->
+<!--<canvas id="topSearchedChart" width="800" height="400"></canvas>-->
+
+<!--<script>-->
+<!--  // ====================== Logs 图表 ======================-->
+<!--  async function loadLogs() {-->
+<!--    const res = await fetch("/logs");-->
+<!--    const data = await res.json();-->
+
+<!--    // 提取每条日志中的小时数（横轴）和请求次数（纵轴）-->
+<!--    const hours = data.map(item => item.hour);-->
+<!--    const counts = data.map((_, i) => i + 1); // 简单编号-->
+
+<!--    new Chart(document.getElementById("logsChart"), {-->
+<!--      type: "line",-->
+<!--      data: {-->
+<!--        labels: hours,-->
+<!--        datasets: [{-->
+<!--          label: "Request Hours",-->
+<!--          data: counts,-->
+<!--          borderWidth: 1-->
+<!--        }]-->
+<!--      }-->
+<!--    });-->
+<!--  }-->
+
+<!--  // ====================== Stats 图表 ======================-->
+<!--  async function loadStats() {-->
+<!--    const res = await fetch("/stats");-->
+<!--    const data = await res.json();-->
+
+<!--    // 提取每个 symbol 和对应的查询次数-->
+<!--    const symbols = data.map(item => item.symbol);-->
+<!--    const counts = data.map(item => item.requestCount);-->
+
+<!--    new Chart(document.getElementById("statsChart"), {-->
+<!--      type: "bar",-->
+<!--      data: {-->
+<!--        labels: symbols,-->
+<!--        datasets: [{-->
+<!--          label: "Request Count",-->
+<!--          data: counts,-->
+<!--          backgroundColor: 'rgba(75, 192, 192, 0.2)',-->
+<!--          borderWidth: 1-->
+<!--        }]-->
+<!--      }-->
+<!--    });-->
+<!--  }-->
+
+<!--  // ====================== Top 5 波动最大公司 ======================-->
+<!--  async function loadTopVolatile() {-->
+<!--    const res = await fetch("/stats");-->
+<!--    const data = await res.json();-->
+
+<!--    // 计算价格波动（最大 - 最小）-->
+<!--    const volatilityData = data.map(item => {-->
+<!--      const prices = item.priceList.split(",").map(Number);-->
+<!--      const diff = Math.max(...prices) - Math.min(...prices);-->
+<!--      return { symbol: item.symbol, volatility: diff };-->
+<!--    });-->
+
+<!--    // 按波动排序并取前 5-->
+<!--    const topVolatile = volatilityData-->
+<!--            .sort((a, b) => b.volatility - a.volatility)-->
+<!--            .slice(0, 5);-->
+
+<!--    new Chart(document.getElementById("volatileChart"), {-->
+<!--      type: "bar",-->
+<!--      data: {-->
+<!--        labels: topVolatile.map(item => item.symbol),-->
+<!--        datasets: [{-->
+<!--          label: "Price Volatility",-->
+<!--          data: topVolatile.map(item => item.volatility),-->
+<!--          backgroundColor: 'orange',-->
+<!--          borderWidth: 1-->
+<!--        }]-->
+<!--      }-->
+<!--    });-->
+<!--  }-->
+
+<!--  // ====================== Top 5 被查询最多公司 ======================-->
+<!--  async function loadTopSearched() {-->
+<!--    const res = await fetch("/stats");-->
+<!--    const data = await res.json();-->
+
+<!--    // 按查询次数排序，取前 5-->
+<!--    const topQueried = data-->
+<!--            .sort((a, b) => b.requestCount - a.requestCount)-->
+<!--            .slice(0, 5);-->
+
+<!--    new Chart(document.getElementById("topSearchedChart"), {-->
+<!--      type: "bar",-->
+<!--      data: {-->
+<!--        labels: topQueried.map(item => item.symbol),-->
+<!--        datasets: [{-->
+<!--          label: "Top Queried",-->
+<!--          data: topQueried.map(item => item.requestCount),-->
+<!--          backgroundColor: 'green',-->
+<!--          borderWidth: 1-->
+<!--        }]-->
+<!--      }-->
+<!--    });-->
+<!--  }-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📊 Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { margin-top: 40px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; font-size: 14px; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+<h1>📊 Dashboard</h1>
+
+<!-- 模块 1：Top 10 被搜索公司名称 -->
+<h2>1️⃣ Top 10 Most Searched Companies</h2>
+<ul id="topCompanies"></ul>
+
+<!-- 模块 2：API 平均响应时间 -->
+<h2>⏱️ API Average Response Time</h2>
+<p id="avgLatency"></p>
+
+<!-- 模块 3：手机型号排名 -->
+<h2>📱 Top Phone Models</h2>
+<ul id="topPhones"></ul>
+
+<!-- 模块 4：所有日志表格展示 -->
+<h2>📝 All Logs</h2>
+<table id="logTable">
+  <thead>
+  <tr>
+    <th>Date</th><th>Weekday</th><th>Hour</th><th>Company</th><th>Prices</th><th>Volumes</th><th>Phone</th><th>Status</th><th>Error</th><th>Latency</th>
+  </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<!-- 模块 5：股价波动（标准差）排名 -->
+<h2>📉 Stock Price Volatility (Std Dev)</h2>
+<ul id="volatilityRank"></ul>
+
+<!-- 模块 6：公司访问次数排名 -->
+<h2>🔢 Company Request Count</h2>
+<ul id="requestCountRank"></ul>
+
+<!-- 模块 7：Status + Error 统计 -->
+<h2>❗ Status + Error Stats</h2>
+<ul id="statusErrorStats"></ul>
+
+<script>
+  window.onload = async function () {
+    try {
+      const resLogs = await fetch('/logs');
+      const logs = await resLogs.json();
+
+      const tableBody = document.querySelector('#logTable tbody');
+      const requestCounts = {}; // 模块6
+      const volatilityMap = {}; // 模块5
+      const phoneCount = {}; // 模块3
+      let totalLatency = 0; // 模块2
+      let statusErrors = {}; // 模块7
+
+      logs.forEach(log => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${log.date}</td>
+            <td>${log.weekday}</td>
+            <td>${log.hour}</td>
+            <td>${log.companyName}</td>
+            <td>${log.priceList}</td>
+            <td>${log.volumeList}</td>
+            <td>${log.phoneModel}</td>
+            <td>${log.status}</td>
+            <td>${log.errorMessage}</td>
+            <td>${log.apiResponseMs}</td>
+          `;
+        tableBody.appendChild(row);
+
+        // 模块1 + 6：公司搜索次数统计
+        if (log.companyName) {
+          requestCounts[log.companyName] = (requestCounts[log.companyName] || 0) + 1;
+        }
+
+        // 模块2：响应时间累加
+        if (log.apiResponseMs) {
+          totalLatency += parseInt(log.apiResponseMs);
+        }
+
+        // 模块3：手机型号统计
+        if (log.phoneModel) {
+          phoneCount[log.phoneModel] = (phoneCount[log.phoneModel] || 0) + 1;
+        }
+
+        // 模块5：股价波动计算
+        if (log.companyName && log.priceList) {
+          const prices = log.priceList.split(',').map(Number);
+          if (prices.length > 1) {
+            const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+            const std = Math.sqrt(prices.reduce((s, v) => s + (v - avg) ** 2, 0) / prices.length);
+            volatilityMap[log.companyName] = std;
+          }
+        }
+
+        // 模块7：status + errorMessage 联合统计
+        const key = `${log.status || 'null'} + ${log.errorMessage || 'null'}`;
+        statusErrors[key] = (statusErrors[key] || 0) + 1;
+      });
+
+      // 模块1：公司按搜索次数排序
+      const topCompanies = Object.entries(requestCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+      topCompanies.forEach(([name, count]) => {
+        const li = document.createElement('li');
+        li.textContent = `${name} (${count} times)`;
+        document.getElementById('topCompanies').appendChild(li);
+      });
+
+      // 模块2：平均响应时间
+      const avg = Math.round(totalLatency / logs.length);
+      document.getElementById('avgLatency').textContent = avg + ' ms';
+
+      // 模块3：手机型号统计
+      const topPhones = Object.entries(phoneCount).sort((a, b) => b[1] - a[1]);
+      topPhones.forEach(([phone, count]) => {
+        const li = document.createElement('li');
+        li.textContent = `${phone}: ${count}`;
+        document.getElementById('topPhones').appendChild(li);
+      });
+
+      // 模块5：波动（标准差）排序
+      const sortedVolatility = Object.entries(volatilityMap).sort((a, b) => b[1] - a[1]);
+      sortedVolatility.forEach(([name, std]) => {
+        const li = document.createElement('li');
+        li.textContent = `${name}: StdDev = ${std.toFixed(2)}`;
+        document.getElementById('volatilityRank').appendChild(li);
+      });
+
+      // 模块6：requestCount 排序（和模块1类似）
+      const sortedRequests = Object.entries(requestCounts).sort((a, b) => b[1] - a[1]);
+      sortedRequests.forEach(([name, count]) => {
+        const li = document.createElement('li');
+        li.textContent = `${name}: ${count} times`;
+        document.getElementById('requestCountRank').appendChild(li);
+      });
+
+      // 模块7：Status + ErrorMessage 组合频率
+      Object.entries(statusErrors).forEach(([key, count]) => {
+        const li = document.createElement('li');
+        li.textContent = `${key}: ${count}`;
+        document.getElementById('statusErrorStats').appendChild(li);
+      });
+
+    } catch (err) {
+      console.error('Error loading dashboard data:', err);
+    }
+  };
+</script>
+</body>
+</html>
